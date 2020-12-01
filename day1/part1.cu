@@ -91,8 +91,11 @@ int main() {
                                d_num_selected_out, n_pairs);
 
     // Get and print answer
+    int n_selected;
+    CUDA_CALL(cudaMemcpy(&n_selected, d_num_selected_out, sizeof(int),
+                        cudaMemcpyDefault));
     std::vector<int> answer(n_pairs);
-    CUDA_CALL(cudaMemcpy(answer.data(), d_out, d_num_selected_out * sizeof(int),
+    CUDA_CALL(cudaMemcpy(answer.data(), d_out, n_selected * sizeof(int),
                          cudaMemcpyDefault));
     for (auto it = answer.begin(); it != answer.end()l ++it) {
         std::cout << *it << std::endl;
