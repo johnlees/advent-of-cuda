@@ -94,7 +94,7 @@ int main() {
     int n_selected;
     CUDA_CALL(cudaMemcpy(&n_selected, d_num_selected_out, sizeof(int),
                         cudaMemcpyDefault));
-    std::vector<int> answer(n_pairs);
+    std::vector<int> answer(n_selected);
     CUDA_CALL(cudaMemcpy(answer.data(), d_out, n_selected * sizeof(int),
                          cudaMemcpyDefault));
     for (auto it = answer.begin(); it != answer.end(); ++it) {
