@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <vector>
 
 #include <cub/device/device_select.cuh>
 
@@ -22,7 +23,7 @@ int calc_col_idx(const int k, const int i, const int n) {
 
 // Square dist matrix kernel which stores sum == 2020 in one array, multiple in another
 __global__
-add_and_multiply(int* expenses_d, char* sums, int* prods, size_t length) {
+void add_and_multiply(int* expenses_d, char* sums, int* prods, size_t length) {
 	int index = blockIdx.x * blockDim.x + threadIdx.x;
 	if (index < length) {
 		int i, j;
@@ -33,9 +34,9 @@ add_and_multiply(int* expenses_d, char* sums, int* prods, size_t length) {
     }
 }
 
-void main() {
+int main() {
     std::string line;
-    std::ifstream infile ("part1.data");
+    std::ifstream infile("part1.data");
 
     // Read input
     std::vector<int> expenses;
@@ -43,7 +44,7 @@ void main() {
       while (std::getline(infile, line)) {
         expenses.push_back(std::stoi(line));
       }
-      myfile.close();
+      infile.close();
     }
 
     // Copy input to device
@@ -62,7 +63,7 @@ void main() {
     CUDA_CALL(cudaMemset(prods, 0, n_pairs * sizeof(int)));
 
     // Calculate sums and products
-    blockCount = (n_pairs + blockSize - 1) / blockSize;
+    size_t blockCount = (n_pairs + blockSize - 1) / blockSize;
     add_and_multiply<<<blockCount, blockSize>>>(expenses_d,
                                                 sums,
                                                 prods,
@@ -104,4 +105,6 @@ void main() {
     CUDA_CALL(cudaFree(d_out));
     CUDA_CALL(cudaFree(d_num_selected_out));
     CUDA_CALL(cudaFree(d_temp_storage));
+
+    return 0;
 }

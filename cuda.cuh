@@ -14,10 +14,10 @@ static void HandleCUDAError(const char *file, int line,
 
   if (status != CUDA_SUCCESS || (status = cudaGetLastError()) != CUDA_SUCCESS) {
     if (status == cudaErrorUnknown) {
-      cpp11::stop("%s(%i) An Unknown CUDA Error Occurred :(\n",
+      throw std::runtime_error("%s(%i) An Unknown CUDA Error Occurred :(\n",
                   file, line);
     }
-    cpp11::stop("%s(%i) CUDA Error Occurred;\n%s\n",
+    throw std::runtime_error("%s(%i) CUDA Error Occurred;\n%s\n",
                 file, line, cudaGetErrorString(status));
   }
 }
