@@ -5,7 +5,6 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
-#include <cpp11/protect.hpp>
 
 static void HandleCUDAError(const char *file, int line,
                             cudaError_t status = cudaGetLastError()) {
