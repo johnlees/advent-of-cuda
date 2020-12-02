@@ -28,9 +28,9 @@ void add_and_multiply(int* expenses_d, char* sums, int* prods, size_t length, si
 	if (index < pairs) {
 		int i, j;
 		i = calc_row_idx(index, length);
-        j = calc_col_idx(index, i, length);
-        *(sums + index) = (*(expenses_d + i) + *(expenses_d + j)) == 2020;
-        *(prods + index) = *(expenses_d + i) * *(expenses_d + j);
+    j = calc_col_idx(index, i, length);
+    *(sums + index) = (*(expenses_d + i) + *(expenses_d + j)) == 2020;
+    *(prods + index) = *(expenses_d + i) * *(expenses_d + j);
     }
 }
 

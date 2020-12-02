@@ -34,6 +34,7 @@ void add_and_multiply(int* expenses_d, char* sums, int* prods, size_t length, si
         break;
       }
     }
+    __syncwarp();
 
     *(sums + index) = (*(expenses_d + i) + *(expenses_d + j) + *(expenses_d + k)) == 2020;
     *(prods + index) = *(expenses_d + i) * *(expenses_d + j) * *(expenses_d + k);
@@ -108,7 +109,9 @@ int main() {
   CUDA_CALL(cudaMemcpy(answer.data(), d_out, n_selected * sizeof(int),
                         cudaMemcpyDefault));
   for (auto it = answer.begin(); it != answer.end(); ++it) {
+    if (*it > 0) {
       std::cout << *it << std::endl;
+    }
   }
 
   // Free device memory
