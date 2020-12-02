@@ -109,7 +109,7 @@ int main() {
   CUDA_CALL(cudaMemcpy(answer.data(), d_out, n_selected * sizeof(int),
                         cudaMemcpyDefault));
   for (auto it = answer.begin(); it != answer.end(); ++it) {
-    if (*it > 0) {
+    if (*it > 1) {
       std::cout << *it << std::endl;
     }
   }
