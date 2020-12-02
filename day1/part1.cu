@@ -23,9 +23,9 @@ int calc_col_idx(const int k, const int i, const int n) {
 
 // Square dist matrix kernel which stores sum == 2020 in one array, multiple in another
 __global__
-void add_and_multiply(int* expenses_d, char* sums, int* prods, size_t length) {
+void add_and_multiply(int* expenses_d, char* sums, int* prods, size_t length, size_t pairs) {
 	int index = blockIdx.x * blockDim.x + threadIdx.x;
-	if (index < length) {
+	if (index < pairs) {
 		int i, j;
 		i = calc_row_idx(index, length);
         j = calc_col_idx(index, i, length);
@@ -67,7 +67,8 @@ int main() {
     add_and_multiply<<<blockCount, blockSize>>>(expenses_d,
                                                 sums,
                                                 prods,
-                                                expenses.size());
+                                                expenses.size(),
+                                                n_pairs);
 
     // Use device select to get the answer
     int *d_out;
