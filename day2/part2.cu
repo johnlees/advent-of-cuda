@@ -39,8 +39,8 @@ void invalidate_passwords(char* passwords, char* policy,
 	int index = blockIdx.x * blockDim.x + threadIdx.x;
 	if (index < input_len) {
         char policy_char = policy[index];
-        if (!((passwords[index + upper[index] * input_len] == policy_char) ^
-             passwords[index + lower[index] * input_len] == policy_char)) {
+        if (!((passwords[index + (upper[index] - 1) * input_len] == policy_char) ^
+             passwords[index + (lower[index] - 1) * input_len] == policy_char)) {
             valid[index] = 0;
         }
     }
