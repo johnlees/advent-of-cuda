@@ -13,5 +13,8 @@ day1-part2:
 day2-part1:
 	nvcc $(CUDAFLAGS) $(CPPFLAGS) day2/part1.cu -o $@
 
+day2-part2:
+	nvcc $(CUDAFLAGS) $(CPPFLAGS) day2/part2.cu -o $@
+
 clean:
 	$(RM) *.o ~* $(DAYS)
