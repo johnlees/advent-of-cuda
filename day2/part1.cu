@@ -4,25 +4,25 @@
 #include <vector>
 #include <regex>
 
-#include <cub/device/device_select.cuh>
+#include <cub/cub.cuh>
 
 #include "../cuda.cuh"
 
 const size_t blockSize = 32;
 const size_t warp_size = 32;
 
-std::vector<char> prepare_array(std:vector<std::string>& passwords) {
+std::vector<char> prepare_array(std::vector<std::string>& passwords) {
     std::vector<char> char_array(warp_size * passwords.size()); // No pw longer than 32 (warp size)
     for (size_t password_idx = 0; password_idx < passwords.size(); password_idx++) {
         size_t char_idx;
         for (char_idx = 0; char_idx < passwords[password_idx].size(); char_idx++) {
             char_array[password_idx + char_idx * passwords.size()] = passwords[password_idx][char_idx];
         }
-        for (size_t pad_idx = char_idx; base_idx < warp_size; pad_idx++) {
-            char_array[read_idx + base_idx * n_full_seqs_padded()] = '0';
+        for (size_t pad_idx = char_idx; pad_idx < warp_size; pad_idx++) {
+            char_array[password_idx + pad_idx * warp_size] = '0';
         }
     }
-    return read_array;
+    return char_array;
 }
 
 template <typename T>
@@ -60,37 +60,40 @@ int main() {
     std::vector<int> copy_upper;
     std::vector<char> policy;
     std::vector<std::string> passwords;
-    std::regex e ("^(\d+)-(\d+) ([a-z]): [a-z]*$");
+    std::regex e ("^([0-9]+)-([0-9]+) ([a-z]): [a-z]*$");
     std::cmatch cm;
     if (infile.is_open()) {
       while (std::getline(infile, line)) {
-        std::regex_match(line.cstr(), cm, e);
+        std::regex_match(line.c_str(), cm, e);
         copy_lower.push_back(std::stoi(cm[0]));
-        copy_upper.push_back(std::stoicm[1]));
-        policy.push_back(cm[2]);
+        copy_upper.push_back(std::stoi(cm[1]));
+        policy.push_back(cm.str(2)[0]);
         passwords.push_back(cm[3]);
       }
       infile.close();
     }
 
     // Restride passwords as array
-    std::vector<char> = prepare_array(passwords);
+    std::vector<char> passwords_strided = prepare_array(passwords);
     size_t input_len = passwords.size();
 
     // Copy input to device
-    char* passwords_d, policy_d; int* lower_d, upper_d;
-    array_to_device(passwords_d, passwords);
+    char* passwords_d = nullptr;
+    char* policy_d = nullptr;
+    int* lower_d = nullptr;
+    int* upper_d = nullptr;
+    array_to_device(passwords_d, passwords_strided);
     array_to_device(policy_d, policy);
     array_to_device(lower_d, copy_lower);
     array_to_device(upper_d, copy_upper);
 
     // Allocate space to store output (assume all valid)
     char* valid_d;
-    CUDA_CALL(cudaMalloc((void** )&valid, input_len * sizeof(char)));
-    CUDA_CALL(cudaMemset(valid, 1, input_len * sizeof(char)));
+    CUDA_CALL(cudaMalloc((void** )&valid_d, input_len * sizeof(char)));
+    CUDA_CALL(cudaMemset(valid_d, 1, input_len * sizeof(char)));
 
     // Check for invalid passwords
-    size_t blockCount = (pass + blockSize - 1) / blockSize;
+    size_t blockCount = (input_len + blockSize - 1) / blockSize;
     invalidate_passwords<<<blockCount, blockSize>>>(passwords_d,
                                                 policy_d,
                                                 lower_d,
