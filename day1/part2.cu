@@ -45,13 +45,12 @@ void add_and_multiply(int* expenses_d, char* sums, int* prods, size_t length, si
 
 int main() {
   std::string line;
-  std::ifstream infile("inputs/part1.data");
+  std::ifstream infile("inputs/day1.data");
 
   // Read input
   std::vector<int> expenses;
   if (infile.is_open()) {
     while (std::getline(infile, line)) {
-      
       expenses.push_back(std::stoi(line));
     }
     infile.close();

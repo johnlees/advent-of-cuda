@@ -40,6 +40,7 @@ void invalidate_passwords(char* passwords, char* policy,
 	if (index < input_len) {
         char policy_char = policy[index];
         int cnt = 0;
+        printf("idx:%d char:%c pw:%c upper:%d lower:%d\n", index, policy_char, passwords[index], upper[index], lower[index]);
         for (int i = 0; i < warp_size; ++i) {
             if (passwords[index + i * input_len] == policy_char) {
                 cnt++;
@@ -53,7 +54,7 @@ void invalidate_passwords(char* passwords, char* policy,
 
 int main() {
     std::string line;
-    std::ifstream infile("inputs/part2.data");
+    std::ifstream infile("inputs/day2.data");
 
     // Read input
     std::vector<int> copy_lower;
@@ -100,6 +101,7 @@ int main() {
                                                 upper_d,
                                                 valid_d,
                                                 input_len);
+    cudaDeviceSynchronize();
 
     // Use device reduce sum to get the answer
     int *d_out;
