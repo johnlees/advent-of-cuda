@@ -31,12 +31,13 @@ __global__
 void count_trees(char* forest, char* trees,
                  size_t length, size_t width) {
 	int index = blockIdx.x * blockDim.x + threadIdx.x;
-	if (index < input_len) {
+	if (index < length) {
         int col = (index * 3) % width;
-        if (forest[index + col * length] == "#") {
+        if (forest[index + col * length] == '#') {
             trees[index] = 1;
         }
     }
+    __syncwarp();
 }
 
 int main() {
@@ -49,7 +50,7 @@ int main() {
     std::vector<std::string> forest;
     if (infile.is_open()) {
       while (std::getline(infile, line)) {
-        forset.push_back(line);
+        forest.push_back(line);
       }
       infile.close();
     }
@@ -85,21 +86,21 @@ int main() {
     size_t temp_storage_bytes = 0;
     cub::DeviceReduce::Sum(d_temp_storage,
                            temp_storage_bytes,
-                           forest_d, d_out,
+                           trees_d, d_out,
                            input_len);
     CUDA_CALL(cudaMalloc(&d_temp_storage, temp_storage_bytes));
 
     // Sum
     cub::DeviceReduce::Sum(d_temp_storage,
                            temp_storage_bytes,
-                           forest_d, d_out,
+                           trees_d, d_out,
                            input_len);
 
     // Get and print answer
-    int* total_trees;
-    CUDA_CALL(cudaMemcpy(total_valid, d_out, sizeof(int),
+    int total_trees;
+    CUDA_CALL(cudaMemcpy(&total_trees, d_out, sizeof(int),
                         cudaMemcpyDefault));
-    std::cout << *total_valid << std::endl;
+    std::cout << total_trees << std::endl;
 
     // Free device memory
     CUDA_CALL(cudaFree(forest_d));
